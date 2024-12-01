@@ -90,19 +90,34 @@ function createHologramPlanes() {
 function updateSubtitles() {
     const currentTime = video.currentTime;
 
-    const topSubtitle = subtitles.top.find((subtitle) => currentTime >= subtitle.time);
-    topSubtitleElement.textContent = topSubtitle ? topSubtitle.text : "";
+    // Top Subtitle
+    const topSubtitle = subtitles.top.find((subtitle, index, array) => {
+        const nextSubtitle = array[index + 1];
+        return currentTime >= subtitle.time && (!nextSubtitle || currentTime < nextSubtitle.time);
+    });
+    topSubtitleElement.textContent = topSubtitle ? topSubtitle.text : "";    
 
-    const bottomSubtitle = subtitles.bottom.find((subtitle) => currentTime >= subtitle.time);
+    // Bottom Subtitle
+    const bottomSubtitle = subtitles.bottom.find((subtitle, index, array) => {
+        const nextSubtitle = array[index + 1];
+        return currentTime >= subtitle.time && (!nextSubtitle || currentTime < nextSubtitle.time);
+    });
     bottomSubtitleElement.textContent = bottomSubtitle ? bottomSubtitle.text : "";
 
-    const leftSubtitle = subtitles.left.find((subtitle) => currentTime >= subtitle.time);
+    // Left Subtitle
+    const leftSubtitle = subtitles.left.find((subtitle, index, array) => {
+        const nextSubtitle = array[index + 1];
+        return currentTime >= subtitle.time && (!nextSubtitle || currentTime < nextSubtitle.time);
+    });
     leftSubtitleElement.textContent = leftSubtitle ? leftSubtitle.text : "";
 
-    const rightSubtitle = subtitles.right.find((subtitle) => currentTime >= subtitle.time);
+    // Right Subtitle
+    const rightSubtitle = subtitles.right.find((subtitle, index, array) => {
+        const nextSubtitle = array[index + 1];
+        return currentTime >= subtitle.time && (!nextSubtitle || currentTime < nextSubtitle.time);
+    });
     rightSubtitleElement.textContent = rightSubtitle ? rightSubtitle.text : "";
 }
-
 
 function addBeepSound() {
     const beep = new Audio("beep.mp3");
