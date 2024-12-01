@@ -52,25 +52,28 @@ function createHologramPlanes() {
     const planeMaterial = new THREE.MeshBasicMaterial({ map: videoTexture, side: THREE.DoubleSide });
 
     const topPlane = new THREE.Mesh(planeGeometry, planeMaterial);
-    topPlane.position.y = 4 / 2;
-    topPlane.scale.y = 1;
+    topPlane.position.y = 5 / 2;
+    topPlane.scale.y = 1.5;
     scene.add(topPlane);
 
     const bottomPlane = new THREE.Mesh(planeGeometry, planeMaterial);
-    bottomPlane.position.y = -4 / 2;
-	bottomPlane.scale.y = -1;
+    bottomPlane.position.y = -5 / 2;
+	bottomPlane.scale.y = -1.5;
+	bottomPlane.scale.x = 1.5;
     scene.add(bottomPlane);
 
     const leftPlane = new THREE.Mesh(planeGeometry, planeMaterial);
-    leftPlane.rotation.z = 3 * Math.PI / 2;	
-	leftPlane.scale.y = -1;
-    leftPlane.position.x = -2;
+    leftPlane.rotation.z = 3 * Math.PI / 2;		
+	leftPlane.scale.y = -1.5;
+	leftPlane.scale.x = 1.5;
+    leftPlane.position.x = -3;
     scene.add(leftPlane);
 
     const rightPlane = new THREE.Mesh(planeGeometry, planeMaterial);
     rightPlane.rotation.z = Math.PI / 2;
-	rightPlane.scale.y = -1;
-    rightPlane.position.x = 2;
+	rightPlane.scale.y = -1.5;
+	rightPlane.scale.x = 1.5;
+    rightPlane.position.x = 3;
     scene.add(rightPlane);
 }
 
