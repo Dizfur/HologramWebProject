@@ -92,19 +92,15 @@ function updateSubtitles() {
 
     const topSubtitle = subtitles.top.find((subtitle) => currentTime >= subtitle.time);
     topSubtitleElement.textContent = topSubtitle ? topSubtitle.text : "";
-    topSubtitleElement.style.transform = "scaleX(-1)"; // Mirror effect for the top
 
     const bottomSubtitle = subtitles.bottom.find((subtitle) => currentTime >= subtitle.time);
     bottomSubtitleElement.textContent = bottomSubtitle ? bottomSubtitle.text : "";
-    bottomSubtitleElement.style.transform = "scaleX(-1)"; // No mirror effect for bottom
 
     const leftSubtitle = subtitles.left.find((subtitle) => currentTime >= subtitle.time);
     leftSubtitleElement.textContent = leftSubtitle ? leftSubtitle.text : "";
-    leftSubtitleElement.style.transform = "scaleX(-1)"; // Mirror effect for left
 
     const rightSubtitle = subtitles.right.find((subtitle) => currentTime >= subtitle.time);
     rightSubtitleElement.textContent = rightSubtitle ? rightSubtitle.text : "";
-    rightSubtitleElement.style.transform = "scaleX(1)"; // No mirror effect for the right
 }
 
 
