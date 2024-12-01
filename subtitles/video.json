@@ -1,0 +1,9 @@
+{
+    "common": [
+        { "time": 0, "text": "Welcome to the Hologram Experience!" },
+        { "time": 2, "text": "" },
+        { "time": 4, "text": "Let's dive deeper!" },
+        { "time": 6, "text": "" },
+        { "time": 8, "text": "Thank you for using the Hologram" }
+    ]
+}
