@@ -7,25 +7,12 @@ const playPauseBtn = document.getElementById("play-pause-btn");
 const timeDisplay = document.getElementById("time-display");
 
 const subtitles = {
-    top: [
+    common: [
         { time: 0, text: "Welcome to the Hologram Experience!" },
         { time: 2, text: "" },
         { time: 4, text: "Let's dive deeper!" },
-    ],
-    bottom: [
-        { time: 0, text: "Welcome to the Hologram Experience!" },
-        { time: 2, text: "" },
-        { time: 4, text: "Let's dive deeper!" },
-    ],
-    left: [
-        { time: 0, text: "Welcome to the Hologram Experience!" },
-        { time: 2, text: "" },
-        { time: 4, text: "Let's dive deeper!" },
-    ],
-    right: [
-        { time: 0, text: "Welcome to the Hologram Experience!" },
-        { time: 2, text: "" },
-        { time: 4, text: "Let's dive deeper!" },
+		{ time: 6, text: "" },
+		{ time: 8, text: "Thank you for using the Hologram" },
     ],
 };
 
@@ -90,33 +77,18 @@ function createHologramPlanes() {
 function updateSubtitles() {
     const currentTime = video.currentTime;
 
-    // Top Subtitle
-    const topSubtitle = subtitles.top.find((subtitle, index, array) => {
+    // Fetch subtitle from a single source (e.g., subtitles.top)
+    const commonSubtitle = subtitles.common.find((subtitle, index, array) => {
         const nextSubtitle = array[index + 1];
         return currentTime >= subtitle.time && (!nextSubtitle || currentTime < nextSubtitle.time);
     });
-    topSubtitleElement.textContent = topSubtitle ? topSubtitle.text : "";    
+    const subtitleText = commonSubtitle ? commonSubtitle.text : "";
 
-    // Bottom Subtitle
-    const bottomSubtitle = subtitles.bottom.find((subtitle, index, array) => {
-        const nextSubtitle = array[index + 1];
-        return currentTime >= subtitle.time && (!nextSubtitle || currentTime < nextSubtitle.time);
-    });
-    bottomSubtitleElement.textContent = bottomSubtitle ? bottomSubtitle.text : "";
-
-    // Left Subtitle
-    const leftSubtitle = subtitles.left.find((subtitle, index, array) => {
-        const nextSubtitle = array[index + 1];
-        return currentTime >= subtitle.time && (!nextSubtitle || currentTime < nextSubtitle.time);
-    });
-    leftSubtitleElement.textContent = leftSubtitle ? leftSubtitle.text : "";
-
-    // Right Subtitle
-    const rightSubtitle = subtitles.right.find((subtitle, index, array) => {
-        const nextSubtitle = array[index + 1];
-        return currentTime >= subtitle.time && (!nextSubtitle || currentTime < nextSubtitle.time);
-    });
-    rightSubtitleElement.textContent = rightSubtitle ? rightSubtitle.text : "";
+    // Update all subtitle elements with the same text
+    topSubtitleElement.textContent = subtitleText;
+    bottomSubtitleElement.textContent = subtitleText;
+    leftSubtitleElement.textContent = subtitleText;
+    rightSubtitleElement.textContent = subtitleText;
 }
 
 function addBeepSound() {
