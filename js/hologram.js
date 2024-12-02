@@ -7,21 +7,39 @@ const playPauseBtn = document.getElementById("play-pause-btn");
 const timeDisplay = document.getElementById("time-display");
 
 let subtitles = []; // Initialize as empty.
+let videoList = [];
+let currentVideoIndex = 0;
+
+async function loadVideoList() {
+    try {
+        const response = await fetch("videoList.json"); // Path to your JSON file
+        if (!response.ok) throw new Error(`Failed to load video list: ${response.statusText}`);
+        const data = await response.json();
+        videoList = data.videos;
+        console.log("Video list loaded:", videoList);
+    } catch (error) {
+        console.error("Error loading video list:", error);
+    }
+}
 
 async function loadSubtitles(videoSrc) {
     try {
         // Extract the base name of the video (e.g., "video" from "videos/video.mp4").
         const videoBaseName = videoSrc.substring(videoSrc.lastIndexOf("/") + 1, videoSrc.lastIndexOf("."));
-        const subtitlePath = `subtitles/${videoBaseName}.json`; // Assume subtitles are in a 'subtitles' folder.
+        const subtitlePath = `subtitles/${videoBaseName}.json`; // Assume subtitles are in a 'subtitles' folder.       
+        console.log("Fetching subtitles from:", subtitlePath);
         
+		// Fetch subtitle file
         const response = await fetch(subtitlePath);
         if (!response.ok) {
             throw new Error(`Failed to fetch subtitles: ${response.statusText}`);
         }
+
         subtitles = await response.json();
         console.log("Subtitles loaded:", subtitles);
     } catch (error) {
-        console.error("Error loading subtitles:", error);
+        console.warn("Error loading subtitles:", error);
+        subtitles = []; // Fallback to an empty subtitles array
     }
 }
 
@@ -37,9 +55,8 @@ function init() {
 
     // Video setup
     video = document.createElement("video");
-    video.src = "videos/video.mp4"; // Specify video source.
     video.crossOrigin = "anonymous";
-    video.loop = true;
+    video.loop = false; // Disable loop for sequential playback
     video.muted = true;
     video.controls = false;
 
@@ -51,14 +68,64 @@ function init() {
 
     video.addEventListener("timeupdate", updateTimeDisplay);
     video.addEventListener("play", playBeep);
+    video.addEventListener("ended", playNextVideo); // Listen for video end to play the next
 
     playPauseBtn.addEventListener("click", togglePlayPause);
 
-    // Load subtitles dynamically based on video name
-    loadSubtitles(video.src).then(() => {
-        video.play(); // Play video after subtitles are loaded
-        animate(); // Start animation loop
+    loadVideoList().then(() => {
+        if (videoList.length > 0) {
+            playVideo(currentVideoIndex);
+            animate();
+        } else {
+            console.error("Video list is empty.");
+        }
     });
+}
+
+async function playVideo(index) {
+    if (index < 0 || index >= videoList.length) {
+        console.error("Invalid video index:", index);
+        return;
+    }
+
+    const videoSrc = videoList[index];
+
+    try {
+        // Check if the video file exists
+        const response = await fetch(videoSrc, { method: "HEAD" });
+        if (!response.ok) {
+            throw new Error(`Video file not found: ${videoSrc}`);
+        }
+
+        // Set the video source and play
+        console.log("Playing video:", videoSrc);
+        video.src = videoSrc;
+
+        // Load subtitles (skip errors here to not block playback)
+        try {
+            await loadSubtitles(videoSrc);
+        } catch (subtitleError) {
+            console.warn("Subtitle file not found or invalid for:", videoSrc, subtitleError);
+        }
+
+        video.play().catch((error) => {
+            console.error("Error playing video:", videoSrc, error);
+            playNextVideo(); // Try the next video if playback fails
+        });
+    } catch (error) {
+        console.error("Error loading video:", error);
+        playNextVideo(); // Skip to the next video
+    }
+}
+
+function playNextVideo() {
+    currentVideoIndex++;
+    if (currentVideoIndex < videoList.length) {
+        console.log("Playing next video. Index:", currentVideoIndex);
+        playVideo(currentVideoIndex);
+    } else {
+        console.log("All videos have been attempted. No more videos to play.");
+    }
 }
 
 function createHologramPlanes() {
