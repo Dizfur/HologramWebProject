@@ -6,7 +6,7 @@ const rightSubtitleElement = document.getElementById("right-subtitle");
 const playPauseBtn = document.getElementById("play-pause-btn");
 const timeDisplay = document.getElementById("time-display");
 
-let subtitles = { common: [] }; // Initialize as empty.
+let subtitles = []; // Initialize as empty.
 
 async function loadSubtitles(videoSrc) {
     try {
@@ -95,18 +95,26 @@ function createHologramPlanes() {
 function updateSubtitles() {
     const currentTime = video.currentTime;
 
-    // Fetch subtitle from the 'common' subtitles
-    const commonSubtitle = subtitles.common.find((subtitle, index, array) => {
+    // Find the subtitle that matches the current time
+    const subtitle = subtitles.find((subtitle, index, array) => {
         const nextSubtitle = array[index + 1];
         return currentTime >= subtitle.time && (!nextSubtitle || currentTime < nextSubtitle.time);
     });
-    const subtitleText = commonSubtitle ? commonSubtitle.text : "";
 
-    // Update all subtitle elements with the same text
+    const subtitleText = subtitle ? subtitle.text : "";
+    const subtitleColor = subtitle ? subtitle.color : "white"; // Default to white if no color is specified
+
+    // Update all subtitle elements with the same text and color
     topSubtitleElement.textContent = subtitleText;
     bottomSubtitleElement.textContent = subtitleText;
     leftSubtitleElement.textContent = subtitleText;
     rightSubtitleElement.textContent = subtitleText;
+
+    // Change the subtitle color
+    topSubtitleElement.style.color = subtitleColor;
+    bottomSubtitleElement.style.color = subtitleColor;
+    leftSubtitleElement.style.color = subtitleColor;
+    rightSubtitleElement.style.color = subtitleColor;
 }
 
 function togglePlayPause() {
