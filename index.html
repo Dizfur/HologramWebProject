@@ -17,7 +17,7 @@
             width: 100%;
             text-align: center;
             color: white;
-            font-size: 36px;
+            font-size: 16px;
             font-family: Arial, sans-serif;
         }
         #top-subtitle {
@@ -29,25 +29,25 @@
 			transform: scaleY(-1);
         }
         #left-subtitle {
-            left: 430px;
-			bottom: 360px;
+            left: 30%;
+			top: 50%;
             transform: translateY(-50%) rotate(90deg) scaleX(-1);
         }
         #right-subtitle {
-            right: 430px;
-			bottom: 360px;
+            right: 30%;
+			top: 50%;
             transform: translateY(-50%) rotate(270deg) scaleX(-1) ;
         }
-        #controls {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 10;
-        }
+		#controls {
+			position: absolute;
+			bottom: 60px; /* Adjust this value to control the distance from the bottom */
+			left: 50%;
+			transform: translateX(-50%); /* Center horizontally */
+			text-align: center;
+			z-index: 10;
+		}
         #controls button {
-            font-size: 18px;
+            font-size: 12px;
             padding: 15px 30px;
             color: white;
             background: rgba(0, 0, 0, 0.7);
@@ -61,7 +61,7 @@
         }
         #time-display {
             margin-top: 10px;
-            font-size: 16px;
+            font-size: 12px;
             color: white;
         }
     </style>
@@ -71,6 +71,8 @@
     <div id="bottom-subtitle" class="subtitle"></div>
     <div id="left-subtitle" class="subtitle"></div>
     <div id="right-subtitle" class="subtitle"></div>
+    
+    <!-- Controls positioned below the bottom plane -->
     <div id="controls">
         <button id="play-pause-btn">Play</button>
         <div id="time-display">0:00 / 0:00</div>
