@@ -9,6 +9,7 @@ const timeDisplay = document.getElementById("time-display");
 let subtitles = []; // Initialize as empty.
 let videoList = [];
 let currentVideoIndex = 0;
+let showBorders = false; // Toggle for border visibility
 
 async function loadVideoList() {
     try {
@@ -82,6 +83,70 @@ function init() {
     });
 }
 
+function createHologramPlanes() {
+    const planeGeometry = new THREE.PlaneGeometry(4, 2.25);
+    const videoMaterial = new THREE.MeshBasicMaterial({ map: videoTexture, side: THREE.DoubleSide });
+
+    const borderMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    const edgesGeometry = new THREE.EdgesGeometry(planeGeometry);
+
+	const createPlaneWithBorder = (position, rotation, scale) => {
+		// Create the main plane
+		const plane = new THREE.Mesh(planeGeometry, videoMaterial);
+		plane.position.set(position.x, position.y, position.z);
+		plane.rotation.set(rotation.x, rotation.y, rotation.z);
+		plane.scale.set(scale.x, scale.y, scale.z);
+		scene.add(plane);
+
+		// Optionally add a border
+		if (showBorders) {
+			const border = new THREE.LineSegments(edgesGeometry, borderMaterial);
+			border.position.copy(plane.position);
+			border.rotation.copy(plane.rotation);
+			border.scale.copy(plane.scale);
+			scene.add(border);
+		}
+	};
+
+	// Common scale value for planes
+	const planeScale = { x: 1.5, y: 1.5, z: 1 };
+
+	// Add planes with their positions, rotations, and scales
+	// Top plane
+	createPlaneWithBorder(
+		{ x: 0, y: 5/ 2, z: 0 }, //position
+		{ x: 0, y: 0, z: 0 }, //rotation
+		planeScale //scale
+	);
+
+	// Bottom plane
+	createPlaneWithBorder(
+		{ x: 0, y: -5 / 2, z: 0 }, //position
+		{ x: 0, y: 0, z: 0 }, //rotation
+		{ x: -planeScale.x, y: -planeScale.y, z: planeScale.z }	//scale
+	);
+
+	// Left plane
+	createPlaneWithBorder(
+		{ x: -3, y: 0, z: 0 }, //position
+		{ x: 0, y: 0, z: (3 * Math.PI) / 2 }, //rotation
+		{ x: planeScale.x, y: -planeScale.y, z: planeScale.z } //scale
+	);
+
+	// Right plane
+	createPlaneWithBorder(
+		{ x: 3, y: 0, z: 0 }, //position
+		{ x: 0, y: 0, z: Math.PI / 2 },	//rotation
+		{ x: planeScale.x, y: -planeScale.y, z: planeScale.z } //scale
+	);
+}
+
+function toggleBorders() {
+    showBorders = !showBorders;
+    scene.clear(); // Clear the scene
+    createHologramPlanes(); // Recreate planes with updated border visibility
+}
+
 async function playVideo(index) {
     if (index < 0 || index >= videoList.length) {
         console.error("Invalid video index:", index);
@@ -126,37 +191,6 @@ function playNextVideo() {
     } else {
         console.log("All videos have been attempted. No more videos to play.");
     }
-}
-
-function createHologramPlanes() {
-    const planeGeometry = new THREE.PlaneGeometry(4, 2.25);
-    const planeMaterial = new THREE.MeshBasicMaterial({ map: videoTexture, side: THREE.DoubleSide });
-
-    const topPlane = new THREE.Mesh(planeGeometry, planeMaterial);
-    topPlane.position.y = 5 / 2;
-    topPlane.scale.y = 1.5;
-	topPlane.scale.x = -1.5;
-    scene.add(topPlane);
-
-    const bottomPlane = new THREE.Mesh(planeGeometry, planeMaterial);
-    bottomPlane.position.y = -5 / 2;
-	bottomPlane.scale.y = -1.5;
-	bottomPlane.scale.x = -1.5;
-    scene.add(bottomPlane);
-
-    const leftPlane = new THREE.Mesh(planeGeometry, planeMaterial);
-    leftPlane.rotation.z = 3 * Math.PI / 2;		
-	leftPlane.scale.y = -1.5;
-	leftPlane.scale.x = 1.5;
-    leftPlane.position.x = -3;
-    scene.add(leftPlane);
-
-    const rightPlane = new THREE.Mesh(planeGeometry, planeMaterial);
-    rightPlane.rotation.z = Math.PI / 2;
-	rightPlane.scale.y = -1.5;
-	rightPlane.scale.x = 1.5;
-    rightPlane.position.x = 3;
-    scene.add(rightPlane);
 }
 
 function updateSubtitles() {
