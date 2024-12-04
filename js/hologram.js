@@ -10,6 +10,8 @@ let subtitles = []; // Initialize as empty.
 let videoList = [];
 let currentVideoIndex = 0;
 let showBorders = false; // Toggle for border visibility
+let isMuted = true; // Initially, the video is muted
+let beep; // Variable to hold beep sound
 
 async function loadVideoList() {
     try {
@@ -73,6 +75,9 @@ function init() {
 
     playPauseBtn.addEventListener("click", togglePlayPause);
 
+    // Add click listener to toggle mute
+    document.addEventListener("click", toggleMute);
+	
     loadVideoList().then(() => {
         if (videoList.length > 0) {
             playVideo(currentVideoIndex);
@@ -109,34 +114,31 @@ function createHologramPlanes() {
 	};
 
 	// Common scale value for planes
-	const planeScale = { x: 1.5, y: 1.5, z: 1 };
+	const planeScale = { x: 0.64, y: 0.64, z: 0.2 };
 
 	// Add planes with their positions, rotations, and scales
 	// Top plane
 	createPlaneWithBorder(
-		{ x: 0, y: 5/ 2, z: 0 }, //position
+		{ x: 0, y: 1.5, z: 0 }, //position
 		{ x: 0, y: 0, z: 0 }, //rotation
 		planeScale //scale
 	);
-
 	// Bottom plane
 	createPlaneWithBorder(
-		{ x: 0, y: -5 / 2, z: 0 }, //position
+		{ x: 0, y: -1.5, z: 0 }, //position
 		{ x: 0, y: 0, z: 0 }, //rotation
 		{ x: -planeScale.x, y: -planeScale.y, z: planeScale.z }	//scale
 	);
-
 	// Left plane
 	createPlaneWithBorder(
-		{ x: -3, y: 0, z: 0 }, //position
+		{ x: -1.5, y: 0, z: 0 }, //position
 		{ x: 0, y: 0, z: (3 * Math.PI) / 2 }, //rotation
 		{ x: planeScale.x, y: -planeScale.y, z: planeScale.z } //scale
 	);
-
 	// Right plane
 	createPlaneWithBorder(
-		{ x: 3, y: 0, z: 0 }, //position
-		{ x: 0, y: 0, z: Math.PI / 2 },	//rotation
+		{ x: 1.5, y: 0, z: 0 }, //position
+		{ x: 0, y: 0, z: Math.PI / 2 }, //rotation
 		{ x: planeScale.x, y: -planeScale.y, z: planeScale.z } //scale
 	);
 }
@@ -189,7 +191,8 @@ function playNextVideo() {
         console.log("Playing next video. Index:", currentVideoIndex);
         playVideo(currentVideoIndex);
     } else {
-        console.log("All videos have been attempted. No more videos to play.");
+        console.log("Video list finished. Waiting for play button to restart.");
+        playPauseBtn.textContent = "Play"; // Change button text to "Play"
     }
 }
 
@@ -220,11 +223,18 @@ function updateSubtitles() {
 
 function togglePlayPause() {
     if (video.paused) {
-        video.play();
         playPauseBtn.textContent = "Pause";
+        // If the video is paused
+        if (currentVideoIndex >= videoList.length) {
+            // If all videos have been played, reset to the first video
+            currentVideoIndex = 0;
+            console.log("Resetting to first video.");
+        }
+        playVideo(currentVideoIndex); // Play the current video
     } else {
         video.pause();
         playPauseBtn.textContent = "Play";
+        console.log("Video paused.");
     }
 }
 
@@ -238,8 +248,16 @@ function updateTimeDisplay() {
 }
 
 function addBeepSound() {
-    const beep = new Audio("beep.mp3");
+    beep = new Audio("beep.mp3");
     window.playBeep = () => beep.play();
+}
+
+function toggleMute() {
+    if (isMuted) {
+        video.muted = false; // Unmute the video
+        isMuted = false; // Set the flag to indicate the video is now unmuted
+        console.log("Video unmuted:", video.muted);
+    }
 }
 
 function onWindowResize() {
