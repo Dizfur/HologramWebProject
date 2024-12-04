@@ -6,6 +6,7 @@ const rightSubtitleElement = document.getElementById("right-subtitle");
 const playPauseBtn = document.getElementById("play-pause-btn");
 const timeDisplay = document.getElementById("time-display");
 
+let audio; // Variable to hold the audio element
 let subtitles = []; // Initialize as empty.
 let videoList = [];
 let currentVideoIndex = 0;
@@ -68,9 +69,10 @@ function init() {
     createHologramPlanes();
     addBeepSound();
     window.addEventListener("resize", onWindowResize, false);
-
     video.addEventListener("timeupdate", updateTimeDisplay);
-    video.addEventListener("play", playBeep);
+	video.addEventListener("timeupdate", synchronizeAudioVideo);
+    video.addEventListener("play", playAudio);
+	video.addEventListener("pause", pauseAudio);
     video.addEventListener("ended", playNextVideo); // Listen for video end to play the next
 
     playPauseBtn.addEventListener("click", togglePlayPause);
@@ -119,13 +121,13 @@ function createHologramPlanes() {
 	// Add planes with their positions, rotations, and scales
 	// Top plane
 	createPlaneWithBorder(
-		{ x: 0, y: 1.5, z: 0 }, //position
+		{ x: 0, y: 2, z: 0 }, //position
 		{ x: 0, y: 0, z: 0 }, //rotation
 		planeScale //scale
 	);
 	// Bottom plane
 	createPlaneWithBorder(
-		{ x: 0, y: -1.5, z: 0 }, //position
+		{ x: 0, y: -2, z: 0 }, //position
 		{ x: 0, y: 0, z: 0 }, //rotation
 		{ x: -planeScale.x, y: -planeScale.y, z: planeScale.z }	//scale
 	);
@@ -133,13 +135,13 @@ function createHologramPlanes() {
 	createPlaneWithBorder(
 		{ x: -1.5, y: 0, z: 0 }, //position
 		{ x: 0, y: 0, z: (3 * Math.PI) / 2 }, //rotation
-		{ x: planeScale.x, y: -planeScale.y, z: planeScale.z } //scale
+		{ x: -planeScale.x, y: -planeScale.y, z: planeScale.z } //scale
 	);
 	// Right plane
 	createPlaneWithBorder(
 		{ x: 1.5, y: 0, z: 0 }, //position
 		{ x: 0, y: 0, z: Math.PI / 2 }, //rotation
-		{ x: planeScale.x, y: -planeScale.y, z: planeScale.z } //scale
+		{ x: -planeScale.x, y: -planeScale.y, z: planeScale.z } //scale
 	);
 }
 
@@ -156,12 +158,28 @@ async function playVideo(index) {
     }
 
     const videoSrc = videoList[index];
+    const videoBaseName = videoSrc.substring(videoSrc.lastIndexOf("/") + 1, videoSrc.lastIndexOf("."));
+    const audioSrc = `audios/${videoBaseName}.mp3`; // Assume audio files are in an 'audio' folder
 
     try {
         // Check if the video file exists
         const response = await fetch(videoSrc, { method: "HEAD" });
         if (!response.ok) {
             throw new Error(`Video file not found: ${videoSrc}`);
+        }
+
+        // Check if the audio file exists
+        const audioResponse = await fetch(audioSrc, { method: "HEAD" });
+        if (!audioResponse.ok) {
+            console.warn(`Audio file not found for video: ${videoBaseName}`);
+            audio = null; // No audio for this video
+        } else {
+            // Load the audio file
+            if (audio) {
+                audio.pause();
+            }
+            audio = new Audio(audioSrc);
+            audio.loop = false;
         }
 
         // Set the video source and play
@@ -179,6 +197,14 @@ async function playVideo(index) {
             console.error("Error playing video:", videoSrc, error);
             playNextVideo(); // Try the next video if playback fails
         });
+
+        // Play audio in sync with the video
+        if (audio) {
+            audio.currentTime = video.currentTime; // Sync audio with video start
+            audio.play().catch((error) => {
+                console.warn("Error playing audio:", audioSrc, error);
+            });
+        }
     } catch (error) {
         console.error("Error loading video:", error);
         playNextVideo(); // Skip to the next video
@@ -235,6 +261,24 @@ function togglePlayPause() {
         video.pause();
         playPauseBtn.textContent = "Play";
         console.log("Video paused.");
+    }
+}
+
+function synchronizeAudioVideo() {
+	if (audio && !audio.paused && Math.abs(audio.currentTime - video.currentTime) > 0.2) {
+        audio.currentTime = video.currentTime; // Resynchronize if desynced
+    }
+}
+
+function pauseAudio() {
+    if (audio) audio.pause();
+}
+
+
+function playAudio() {
+    if (audio) {
+        audio.currentTime = video.currentTime; // Ensure sync
+        audio.play();
     }
 }
 
