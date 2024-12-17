@@ -17,13 +17,27 @@ let currentTime = 0; // Variable to store the current time of the video
 
 async function loadVideoList() {
     try {
-        const response = await fetch("videoList.json"); // Path to your JSON file
-        if (!response.ok) throw new Error(`Failed to load video list: ${response.statusText}`);
-        const data = await response.json();
-        videoList = data.videos;
-        console.log("Video list loaded:", videoList);
+        const response = await fetch("./videoList.json"); // Adjust path as needed
+        if (!response.ok) {
+            throw new Error(`Failed to load video list: ${response.statusText}`);
+        }
+
+        // Attempt to parse JSON
+        try {
+            const data = await response.json();
+            videoList = data.videos;
+
+            if (!Array.isArray(videoList)) {
+                throw new Error("Invalid JSON format: 'videos' should be an array.");
+            }
+
+            console.log("Video list loaded:", videoList);
+        } catch (jsonError) {
+            throw new Error(`Invalid JSON format: ${jsonError.message}`);
+        }
     } catch (error) {
         console.error("Error loading video list:", error);
+        displayErrorUI(error.message); // Pass error message to display on the UI
     }
 }
 
@@ -320,6 +334,22 @@ function animate() {
 
     updateSubtitles();
     renderer.render(scene, camera);
+}
+
+function displayErrorUI(errorMessage) {
+    const errorContainer = document.getElementById("error-container");
+    errorContainer.innerHTML = `
+        <p>Error: ${errorMessage}</p>
+        <p>Please try again later.</p>
+        <button id="retry-btn" style="margin-top: 10px; padding: 5px 10px; font-size: 16px;">Retry</button>
+    `;
+    errorContainer.style.display = "block"; // Make the error message visible
+
+    const retryButton = document.getElementById("retry-btn");
+    retryButton.addEventListener("click", () => {
+        errorContainer.style.display = "none"; // Hide error message
+        loadVideoList(); // Retry loading the video list
+    });
 }
 
 init();
