@@ -13,6 +13,7 @@ let currentVideoIndex = 0;
 let showBorders = false; // Toggle for border visibility
 let isMuted = true; // Initially, the video is muted
 let beep; // Variable to hold beep sound
+let currentTime = 0; // Variable to store the current time of the video
 
 async function loadVideoList() {
     try {
@@ -249,15 +250,19 @@ function updateSubtitles() {
 
 function togglePlayPause() {
     if (video.paused) {
-        playPauseBtn.textContent = "Pause";
-        // If the video is paused
-        if (currentVideoIndex >= videoList.length) {
-            // If all videos have been played, reset to the first video
-            currentVideoIndex = 0;
-            console.log("Resetting to first video.");
+        // Resume from the last saved time if applicable
+        if (currentTime > 0) {
+            video.currentTime = currentTime;
+            console.log(`Resuming video from ${currentTime} seconds.`);
         }
-        playVideo(currentVideoIndex); // Play the current video
+	video.play();
+	playPauseBtn.textContent = "Pause";
+	console.log("Video played.");
     } else {
+        // Save the current playback time
+        currentTime = video.currentTime;
+        console.log(`Saving current time: ${currentTime} seconds.`);
+        
         video.pause();
         playPauseBtn.textContent = "Play";
         console.log("Video paused.");
