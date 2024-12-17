@@ -5,18 +5,23 @@
     "color": "#c02121"
   },
   {
-    "text": "Renewable energy comes from natural sources that are constantly replenished.",
-	"time": 7,
+    "text": "Renewable energy comes from natural sources",
+    "time": 7,
+    "color": "#FFFF00"
+  },
+  {
+    "text": "that are constantly replenished.",
+    "time": 9,
     "color": "#FFFF00"
   },
   {
     "text": "Some key types of renewable energy include:",
-	"time": 11,
+    "time": 11,
     "color": "#00FFFF"
   },
   {
     "text": "Solar energy: harnessed from the sun",
-	"time": 14,
+    "time": 14,
     "color": "#00FF00"
   },
   {
@@ -30,13 +35,23 @@
     "color": "#0e5777"
   },
   {
-    "text": "Today, we will focus on solar energy--how it works and why it is vital for a sustainable future! Let’s dive in and see it all come alive through the hologram box.",
+    "text": "Today, we will focus on solar energy--how it works",
     "time": 24,
     "color": "#0e5777"
   },
   {
-    "text": "Let’s dive in and see it all come alive through the hologram box.",
+    "text": "and why it is vital for a sustainable future!",
+    "time": 27,
+    "color": "#0e5777"
+  },
+  {
+    "text": "Let’s dive in and see it all come alive",
     "time": 30,
     "color": "#0e5777"
+  },
+  {
+    "text": " through the hologram box.",
+    "time": 31,
+    "color": "#cb6c6c"
   }
 ]
