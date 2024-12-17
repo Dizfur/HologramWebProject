@@ -1,6 +1,9 @@
 {
   "videos": [
-    "videos/Pi.mp4",
-    "videos/video.mp4",
+	"videos/Pi.mp4",
+	"videos/IntroductionToRenewableEnergy.mp4",
+	"videos/SolarEnergy.mp4",
+	"videos/Conclusion.mp4",
+	"videos/AskQuestion.mp4"
   ]
 }
