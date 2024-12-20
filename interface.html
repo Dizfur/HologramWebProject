@@ -122,15 +122,32 @@
 
         <!-- Preview Section -->
         <div class="preview" id="preview-box">
-            <div class="default-preview">Select an energy type to preview details here.</div>
+            <div class="default-preview"><p>Welcome to Hologram Projection Interface.</p><p>Select an energy type to preview details here.<p></div>
         </div>
 
         <!-- Button Group -->
         <div class="button-group">
             <button class="button" onclick="zoomInOut()">Zoom In/Out</button>
             <button class="button" onclick="playAnimation()">Play Animation</button>
+			<button class="button" onclick="generateReport()">Report</button>
         </div>
     </div>
+
+<!-- Mockup Modal for Report -->
+<div id="report-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center;">
+    <div style="background: #1f1f1f; color: white; padding: 20px; border-radius: 10px; width: 400px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);">
+        <h3 style="margin-top: 0;">Generate Report</h3>
+        <p>Simulating the report generation process...</p>
+        <ul>
+            <li>Gathering data...</li>
+            <li>Formatting report...</li>
+            <li>Preparing download...</li>
+        </ul>
+        <div style="text-align: right; margin-top: 15px;">
+            <button onclick="closeReportModal()" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 10px;">Close</button>
+        </div>
+    </div>
+</div>
 
     <!-- JavaScript for Interactions -->
     <script>
@@ -186,6 +203,21 @@
         function zoomInOut() {
             alert('Zoom functionality will be implemented here.');
         }
+
+    function generateReport() {
+        // Show the mockup modal
+        document.getElementById('report-modal').style.display = 'flex';
+
+        // Simulate report generation steps
+        setTimeout(() => {
+            alert("Report has been successfully generated! This is a mockup action.");
+        }, 3000); // Simulate a delay of 3 seconds
+    }
+
+    function closeReportModal() {
+        // Hide the modal
+        document.getElementById('report-modal').style.display = 'none';
+    }
     </script>
 </body>
 </html>
