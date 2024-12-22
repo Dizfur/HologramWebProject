@@ -314,7 +314,8 @@
 		}
 
         // WebSocket connection
-        const ws = new WebSocket('ws://192.168.0.222:3000'); // Replace with your WebSocket server URL
+        const ws = new WebSocket('wss://my-websocket-server-d22eouhpb-dizfurs-projects.vercel.app/api/websocket')
+        //const ws = new WebSocket('ws://192.168.0.222:3000'); // Replace with your WebSocket server URL
 
         ws.onopen = () => {
             console.log('WebSocket connection established.');

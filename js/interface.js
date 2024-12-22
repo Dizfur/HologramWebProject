@@ -1,4 +1,5 @@
-        const ws = new WebSocket('ws://192.168.0.222:3000'); // Connect to WebSocket server
+        const ws = new WebSocket('wss://my-websocket-server-d22eouhpb-dizfurs-projects.vercel.app/api/websocket')
+        //const ws = new WebSocket('ws://192.168.0.222:3000'); // Connect to WebSocket server
         let selectedVideo = ''; // Variable to hold the selected video
 		let selectedIcon = null; // Variable to keep track of the selected icon
 		
