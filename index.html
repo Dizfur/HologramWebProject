@@ -17,6 +17,33 @@
             background: #1f1f1f;
         }
 
+        .subtitle {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+        }
+        #top-subtitle {
+            top: 100px;
+			transform: scaleX(-1);
+        }
+        #bottom-subtitle {
+            bottom: 50px;
+			transform: scaleY(-1);
+        }
+        #left-subtitle {
+            left: 150px;
+			top: 50%;
+            transform: translateY(-50%) rotate(90deg) scaleX(-1);
+        }
+        #right-subtitle {
+            right: 150px;
+			top: 50%;
+            transform: translateY(-50%) rotate(270deg) scaleX(-1) ;
+        }
+		
         canvas {
             width: 100%;
             height: 100%;
@@ -25,14 +52,44 @@
     </style>
 </head>
 <body>
+    <div id="top-subtitle" class="subtitle"></div>
+    <div id="bottom-subtitle" class="subtitle"></div>
+    <div id="left-subtitle" class="subtitle"></div>
+    <div id="right-subtitle" class="subtitle"></div>
+	
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         const params = new URLSearchParams(window.location.search);
         const videoSourceUrl = params.get('video');
         const playButton = document.getElementById('play-button');
 
+		const topSubtitleElement = document.getElementById("top-subtitle");
+		const bottomSubtitleElement = document.getElementById("bottom-subtitle");
+		const leftSubtitleElement = document.getElementById("left-subtitle");
+		const rightSubtitleElement = document.getElementById("right-subtitle");
+		
         let scene, camera, renderer, video, videoTexture, videoMesh;
 		let showBorders = true; // Toggle for border visibility
+		let subtitles = []; // Global subtitles array
+		
+		// Async function to load subtitles
+		async function loadSubtitles(videoSrc) {
+			try {
+				const videoBaseName = videoSrc.substring(videoSrc.lastIndexOf("/") + 1, videoSrc.lastIndexOf("."));
+				const subtitlePath = `subtitles/${videoBaseName}.json`;
+				const response = await fetch(subtitlePath);
+
+				if (!response.ok) {
+					throw new Error(`Failed to fetch subtitles: ${response.statusText}`);
+				}
+
+				subtitles = await response.json();
+				console.log("Subtitles loaded:", subtitles);
+			} catch (error) {
+				console.warn("Error loading subtitles:", error);
+				subtitles = []; // Fallback to empty subtitles
+			}
+		}
 		
         // Initialize Three.js
         function init() {
@@ -65,27 +122,41 @@
             
 			// Start the render loop
             animate();
+
         }
 
         // Render loop
         function animate() {
             requestAnimationFrame(animate);
+            updateSubtitles();
             renderer.render(scene, camera);
         }
+		
+		function updateSubtitles() {
+			const currentTime = video.currentTime;
 
-        // Function to play the video
-        function playVideo() {
-            if (videoSourceUrl) {
-                video.src = videoSourceUrl; // Set video source from the URL parameter
-                video.load(); // Load the video
-                video.play().catch(error => {
-                    console.error('Error attempting to play video:', error);
-                });
-            } else {
-                console.error('No video selected.'); // Log an error if no video is provided
-            }
-        }
+			// Find the subtitle that matches the current time
+			const subtitle = subtitles.find((subtitle, index, array) => {
+				const nextSubtitle = array[index + 1];
+				return currentTime >= subtitle.time && (!nextSubtitle || currentTime < nextSubtitle.time);
+			});
 
+			const subtitleText = subtitle ? subtitle.text : "";
+			const subtitleColor = subtitle ? subtitle.color : "white"; // Default to white if no color is specified
+			
+			// Update all subtitle elements with the same text and color
+			topSubtitleElement.textContent = subtitleText;
+			bottomSubtitleElement.textContent = subtitleText;
+			leftSubtitleElement.textContent = subtitleText;
+			rightSubtitleElement.textContent = subtitleText;
+
+			// Change the subtitle color
+			topSubtitleElement.style.color = subtitleColor;
+			bottomSubtitleElement.style.color = subtitleColor;
+			leftSubtitleElement.style.color = subtitleColor;
+			rightSubtitleElement.style.color = subtitleColor;
+		}
+		
 		function createHologramPlanes() {
 			const planeGeometry = new THREE.PlaneGeometry(4, 2.25);
 			const videoMaterial = new THREE.MeshBasicMaterial({ map: videoTexture, side: THREE.DoubleSide });
@@ -155,30 +226,31 @@
         };
 
         ws.onmessage = (event) => {
-            console.log('Received message:', event.data);
+			console.log('Received message:', event.data);
 
-            // Check if the received message is of type 'string'
-            if (typeof event.data === 'string') {
-                try {
-                    const message = JSON.parse(event.data);
-                    if (message.action === 'play') {
-                        // Update video source and play
-                        const newVideoUrl = 'videos/' + message.video; // Assuming the message contains the video URL
-                        console.log('New video URL:', newVideoUrl); // Log the new URL
-                        video.src = newVideoUrl; // Update the video source
-                        video.load(); // Load the new video
-                        video.play().catch(error => {
-                            console.error('Error attempting to play video:', error);
-                        });
-                    }
-                } catch (error) {
-                    console.error('Failed to parse message as JSON:', error);
-                    alert('Received an invalid message from the server.'); // Alert the user
-                }
-            } else {
-                console.error('Received unexpected data type:', typeof event.data);
-            }
-        };
+			// Check if the received message is of type 'string'
+			if (typeof event.data === 'string') {
+				try {
+					const message = JSON.parse(event.data);
+					if (message.action === 'play') {
+						// Update video source and play
+						const newVideoUrl = 'videos/' + message.video; // Assuming the message contains the video URL
+						console.log('New video URL:', newVideoUrl); // Log the new URL
+						video.src = newVideoUrl; // Update the video source
+						video.load(); // Load the new video
+						loadSubtitles(newVideoUrl); // Load subtitles for the new video
+						video.play().catch(error => {
+							console.error('Error attempting to play video:', error);
+						});
+					}
+				} catch (error) {
+					console.error('Failed to parse message as JSON:', error);
+					alert('Received an invalid message from the server.'); // Alert the user
+				}
+			} else {
+				console.error('Received unexpected data type:', typeof event.data);
+			}
+		};
 
         ws.onerror = (error) => {
             console.error('WebSocket error:', error);
