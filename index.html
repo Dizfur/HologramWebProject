@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js Video Player</title>
+    <title>Hologram Video Player</title>
+	
+	<!-- Link to favicon -->
+    <link rel="icon" href="ico/hologram.ico" type="image/x-icon">
     <style>
-        /* Video Container */
-        .video-container {
-            position: relative;
-            width: 800px;
-            height: 450px;
-            margin: auto;
+		body {
+            margin: 0;
             overflow: hidden;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            background: #1f1f1f;
+            background-color: black;
+			perspective: 1000px; /* Perspective for 3D space */
+			transform-style: preserve-3d; /* Allow 3D transformations for child elements */
         }
-
         .subtitle {
             position: absolute;
             width: 100%;
@@ -49,9 +47,41 @@
             height: 100%;
             display: block; /* Ensure canvas takes full space */
         }
+		
+        #modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+		
+        #modal button {
+            padding: 15px 30px;
+            font-size: 20px;
+            font-family: Arial, sans-serif;
+            color: white;
+            background: #444;
+            border: 2px solid white;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+		
+        #modal button:hover {
+            background: #666;
+        }
     </style>
 </head>
 <body>
+    <div id="modal">
+        <button id="bypass-autoplay-restriction-button">Bypass Autoplay Restriction</button>
+    </div>
+
     <div id="top-subtitle" class="subtitle"></div>
     <div id="bottom-subtitle" class="subtitle"></div>
     <div id="left-subtitle" class="subtitle"></div>
@@ -61,8 +91,7 @@
     <script>
         const params = new URLSearchParams(window.location.search);
         const videoSourceUrl = params.get('video');
-        const playButton = document.getElementById('play-button');
-
+        const bypassAutoplayRestrictionButton = document.getElementById('bypass-autoplay-restriction-button');
 		const topSubtitleElement = document.getElementById("top-subtitle");
 		const bottomSubtitleElement = document.getElementById("bottom-subtitle");
 		const leftSubtitleElement = document.getElementById("left-subtitle");
@@ -71,6 +100,8 @@
         let scene, camera, renderer, video, videoTexture, videoMesh;
 		let showBorders = true; // Toggle for border visibility
 		let subtitles = []; // Global subtitles array
+		let audio; // Variable to hold the audio element
+		let isMuted = true; // Initially, the video is muted
 		
 		// Async function to load subtitles
 		async function loadSubtitles(videoSrc) {
@@ -88,6 +119,42 @@
 			} catch (error) {
 				console.warn("Error loading subtitles:", error);
 				subtitles = []; // Fallback to empty subtitles
+			}
+		}
+		
+		async function loadAudio(videoSrc) {
+			const videoBaseName = videoSrc.substring(videoSrc.lastIndexOf("/") + 1, videoSrc.lastIndexOf("."));
+			const audioSrc = `audios/${videoBaseName}.mp3`; // Assume audio files are in an 'audio' folder
+
+			try {
+				// Check if the audio file exists
+				const audioResponse = await fetch(audioSrc, { method: "HEAD" });
+				if (!audioResponse.ok) {
+					console.warn(`Audio file not found for video: ${videoBaseName}`);
+					audio = null; // No audio for this video
+				} else {
+					// Load the audio file
+					if (audio) {
+						audio.pause();
+					}
+					audio = new Audio(audioSrc);
+					audio.loop = false; // Disable looping
+				}
+			} catch (error) {
+				console.error("Error loading audio:", error);
+			}
+		}
+
+		function playAudio() {
+			if (audio) {
+				audio.currentTime = video.currentTime; // Ensure sync
+				audio.play();
+			}
+		}
+
+		function synchronizeAudioVideo() {
+			if (audio && !audio.paused && Math.abs(audio.currentTime - video.currentTime) > 0.2) {
+				audio.currentTime = video.currentTime; // Resynchronize if desynced
 			}
 		}
 		
@@ -111,6 +178,7 @@
             video.muted = true; // Mute the video if autoplaying in some browsers
 			video.loop = false; // Disable loop for sequential playback
 			video.controls = false;
+			video.autoplay = true;
 			
             // Create video texture
             videoTexture = new THREE.VideoTexture(video);
@@ -119,7 +187,8 @@
 
             // Create a plane geometry for video
 			createHologramPlanes()
-            
+            window.addEventListener("resize", onWindowResize, false);
+			bypassAutoplayRestrictionButton.addEventListener('click', bypassAutoPlayRestriction);
 			// Start the render loop
             animate();
 
@@ -128,9 +197,29 @@
         // Render loop
         function animate() {
             requestAnimationFrame(animate);
-            updateSubtitles();
+			updateSubtitles();
+			//console.log(subtitles);
             renderer.render(scene, camera);
         }
+		
+		// Ensure audio plays on button click to bypass autoplay restrictions
+		function bypassAutoPlayRestriction() {
+			modal.style.display = 'none'; // Hide the modal
+			if (videoSourceUrl) {
+				video.src = videoSourceUrl;
+				video.load();
+				video.play() // Attempt to play video
+					.then(() => {
+						console.log("Video playback started.");
+						playAudio(); // Play the audio after the video starts
+					})
+					.catch(error => {
+						console.error("Error attempting to play video:", error);
+					});
+			} else {
+				console.error("No video source URL provided.");
+			}
+		}
 		
 		function updateSubtitles() {
 			const currentTime = video.currentTime;
@@ -218,6 +307,12 @@
 			createHologramPlanes(); // Recreate planes with updated border visibility
 		}
 
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+		}
+
         // WebSocket connection
         const ws = new WebSocket('ws://192.168.0.222:3000'); // Replace with your WebSocket server URL
 
@@ -239,6 +334,10 @@
 						video.src = newVideoUrl; // Update the video source
 						video.load(); // Load the new video
 						loadSubtitles(newVideoUrl); // Load subtitles for the new video
+						loadAudio(newVideoUrl) // Load audio for the new video
+							.then(() => {
+								playAudio(); // Attempt to play audio after loading
+							});
 						video.play().catch(error => {
 							console.error('Error attempting to play video:', error);
 						});
