@@ -1,9 +1,31 @@
         const ws = new WebSocket('ws://192.168.0.222:3000'); // Connect to WebSocket server
         let selectedVideo = ''; // Variable to hold the selected video
-
+		let selectedIcon = null; // Variable to keep track of the selected icon
+		
         ws.onopen = () => {
             console.log('Connected to WebSocket server');
         };
+
+		function toggleIcon(iconElement, type, video) {
+			// Check if the clicked icon is already selected
+			if (selectedIcon === iconElement) {
+				// Unselect the icon
+				selectedIcon.classList.remove('selected'); // Remove selected class
+				selectedIcon = null; // Clear the selected icon
+				document.getElementById('preview-box').innerHTML = `<div class="default-preview"><p>Welcome to Hologram Projection Interface.</p><p>Select an energy type to preview details here.</p></div>`;
+				selectedVideo = ''; // Clear the selected video
+			} else {
+				// Select the new icon
+				if (selectedIcon) {
+					selectedIcon.classList.remove('selected'); // Deselect the previously selected icon
+				}
+				selectedIcon = iconElement; // Set the new selected icon
+				selectedIcon.classList.add('selected'); // Add selected class
+
+				// Show the preview for the selected energy type
+				showPreview(type, video);
+			}
+		}
 
         function showPreview(type, video) {
             const previewBox = document.getElementById('preview-box');

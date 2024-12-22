@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Education for Renewable Energy</title>
+	
+	<!-- Link to favicon -->
+    <link rel="icon" href="ico/interface.ico" type="image/x-icon">
     <style>
         /* General Page Styling */
         body {
@@ -119,6 +122,10 @@
             justify-content: center;
             align-items: center;
         }
+		.icon.selected img {
+			border-color: #ffcc00; /* Change border color to indicate selection */
+			box-shadow: 0 0 10px rgba(255, 204, 0, 0.5); /* Add a glow effect */
+		}
     </style>
 </head>
 <body>
@@ -129,23 +136,23 @@
 
         <!-- Energy Type Selection -->
         <div class="energy-icons">
-            <div class="icon" onclick="showPreview('solar', 'solar.mp4')">
-                <img src="images/solar.png" alt="Solar">
-            </div>
-            <div class="icon" onclick="showPreview('wind', 'wind.mp4')">
-                <img src="images/wind.png" alt="Wind">
-            </div>
-            <div class="icon" onclick="showPreview('hydropower', 'hydropower.mp4')">
-                <img src="images/water.png" alt="Hydropower">
-            </div>
-            <div class="icon" onclick="showPreview('geothermal', 'geothermal.mp4')">
-                <img src="images/geothermal.jpg" alt="Geothermal">
-            </div>
+			<div class="icon" onclick="toggleIcon(this, 'solar', 'solar.mp4')">
+				<img src="images/solar.png" alt="Solar">
+			</div>
+			<div class="icon" onclick="toggleIcon(this, 'wind', 'wind.mp4')">
+				<img src="images/wind.png" alt="Wind">
+			</div>
+			<div class="icon" onclick="toggleIcon(this, 'hydropower', 'hydropower.mp4')">
+				<img src="images/water.png" alt="Hydropower">
+			</div>
+			<div class="icon" onclick="toggleIcon(this, 'geothermal', 'geothermal.mp4')">
+				<img src="images/geothermal.jpg" alt="Geothermal">
+			</div>
         </div>
 
         <!-- Preview Section -->
         <div class="preview" id="preview-box">
-            <div class="default-preview"><p>Welcome to Hologram Projection Interface.</p><p>Select an energy type to preview details here.</p></div>
+            <div class="default-preview"><h3>Welcome to Hologram Projection Interface.</h3><p>Select an energy type to preview details here.</p></div>
         </div>
 
         <!-- Button Group -->
