@@ -78,12 +78,34 @@
 
         /* Last Played Video Section */
         .last-played {
-            background-color: #1f1f1f;
-            padding: 15px;
-            border-radius: 10px;
+            background: linear-gradient(135deg, #3b82f6, #1f1f1f);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
             margin: 20px;
-            color: #bbbbbb;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .last-played:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .last-played-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .last-played-description {
             font-size: 16px;
+            color: #cccccc;
+            margin: 0;
+            line-height: 1.5;
         }
 
         /* Buttons */
@@ -290,11 +312,11 @@
             </button>   
         </div>
 		
-		<!-- Last Played Video Section -->
-		<div class="last-played" id="last-played">
-			<h3>Last Played Video:</h3>
-			<p id="last-played-info">None</p> <!-- Default message if no video has been played -->
-		</div>	
+        <!-- Last Played Video Section -->
+        <div class="last-played" id="last-played">
+            <h3 class="last-played-title">Last Played Video:</h3>
+            <p id="last-played-info" class="last-played-description">None</p>
+        </div>
     </div>
 
     <!-- Quiz Modal -->
