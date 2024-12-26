@@ -1,6 +1,6 @@
 // Parse URL parameters
 const params = new URLSearchParams(window.location.search);
-const videoSourceUrl = params.get('video');
+const videoSourceUrl = params.get('video') || 'videos/introAssistant.mp4'; // Default video source;
 
 // Get DOM elements
 const bypassAutoplayRestrictionButton = document.getElementById('bypass-autoplay-restriction-button');
@@ -159,8 +159,25 @@ function init() {
     video.addEventListener("timeupdate", synchronizeAudioVideo);
     bypassAutoplayRestrictionButton.addEventListener('click', bypassAutoPlayRestriction);
 
+    // Play the default video
+    playIntroAssistantVideo();
+
     // Start the render loop
     animate();
+}
+
+// Function to play the default video
+async function playIntroAssistantVideo() {
+
+    // Hide the bypass autoplay restriction button
+    //bypassAutoplayRestrictionButton.style.display = 'none'; // Hide the button
+    video.src = videoSourceUrl; // Set the video source to the default URL
+    video.load(); // Load the video
+    loadAudio(videoSourceUrl); // Load audio for the default video
+    loadSubtitles(videoSourceUrl); // Load subtitles for the default video
+    video.play().catch(error => {
+        console.error("Error attempting to play default video:", error);
+    });
 }
 
 // Render loop
