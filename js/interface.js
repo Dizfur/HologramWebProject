@@ -125,15 +125,12 @@ function videoExists(videoPath) {
     // Create a new Promise to check video existence
     return new Promise((resolve) => {
         const video = document.createElement('video');
+        video.style.display = 'none'; // Ensure it's invisible
         video.src = videoPath;
-        
         // Event listener for when the video can play
         video.oncanplaythrough = () => resolve(true);
         // Event listener for errors
         video.onerror = () => resolve(false);
-        
-        // Load the video to trigger the above events
-        video.load();
     });
 }
 
@@ -142,8 +139,8 @@ function videoExists(videoPath) {
 async function playAnimation() {
     if (selectedVideo) {
         // Append '/videos' to the selected video path
-        const videoPath = `/videos/${selectedVideo}`;
-        
+        const videoPath = `videos/${selectedVideo}`;
+        console.log(videoPath);
         // Check if the video exists before sending the WebSocket message
         const exists = await videoExists(videoPath);
         
@@ -183,7 +180,7 @@ function closeQuizModal() {
 // Function to play the quiz video
 async function playQuizVideo(videoFile) {
     // Append '/videos' to the selected video path
-        const videoPath = `/videos/${videoFile}`;
+        const videoPath = `videos/${videoFile}`;
         
     // Check if the video exists before sending the WebSocket message
     const exists = await videoExists(videoPath);
