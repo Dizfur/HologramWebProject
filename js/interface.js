@@ -129,6 +129,13 @@ function playQuizVideo(energyType, videoFile) {
         const jsonmessage = JSON.stringify(message);
         console.log(jsonmessage);
         ws.send(jsonmessage);
+		
+        // Update last played video info
+        const lastPlayedInfo = document.getElementById('last-played-info');
+        lastPlayedInfo.innerHTML = `${videoFile.split('/').pop()}`; // Extracts the video filename from the path
+
+        // Show the answer modal
+        document.getElementById('answer-modal').style.display = 'flex';
     } else {
         console.error('WebSocket is not open. Cannot send video data.');
     }
