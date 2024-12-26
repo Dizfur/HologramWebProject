@@ -14,29 +14,60 @@ let scene, camera, renderer, video, videoTexture, audio;
 let showBorders = false; // Toggle for border visibility
 let subtitles = []; // Global subtitles array
 let isMuted = true; // Initially, the video is muted
+let ws; // Variable to hold the WebSocket instance
 
-// WebSocket connection
+// WebSocket URL
 const webSocketURL = 'wss://troubled-alkaline-carnation.glitch.me';
-const ws = new WebSocket(webSocketURL);
+let reconnectInterval = 5000; // Reconnection interval in milliseconds
+let maxRetries = 10; // Maximum reconnection attempts
+let retryCount = 0; // Current retry count
 
-// WebSocket event handlers
-ws.onopen = () => {
-    console.log(webSocketURL);
-    console.log('WebSocket connection established.');
-};
+// Initialize WebSocket connection
+function connectWebSocket() {
+    ws = new WebSocket(webSocketURL);
 
-ws.onmessage = (event) => {
-    console.log('Received message:', event.data);
-    handleWebSocketMessage(event.data);
-};
+    ws.onopen = () => {
+        console.log('WebSocket connection established.');
+        retryCount = 0; // Reset retry count on successful connection
+    };
 
-ws.onerror = (error) => {
-    console.error('WebSocket error:', error);
-};
+    ws.onmessage = (event) => {
+        console.log('Message received:', event.data);
+        handleWebSocketMessage(event.data);
+    };
 
-ws.onclose = () => {
-    console.log('WebSocket connection closed.');
-};
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+
+    ws.onclose = (event) => {
+        console.warn('WebSocket connection closed:', event.reason);
+        if (retryCount < maxRetries) {
+            console.log(`Reconnecting in ${reconnectInterval / 1000} seconds...`);
+            setTimeout(() => {
+                retryCount++;
+                console.log(`Reconnection attempt #${retryCount}`);
+                connectWebSocket();
+            }, reconnectInterval);
+        } else {
+            console.error('Maximum reconnection attempts reached. WebSocket not reconnected.');
+        }
+    };
+}
+
+// Send a message via WebSocket with error handling
+function sendWebSocketMessage(message) {
+    if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(message));
+        console.log('Message sent:', message);
+    } else {
+        console.error('Cannot send message. WebSocket is not open.');
+        alert('Unable to send the message. WebSocket connection is not active.');
+    }
+}
+
+// Establish WebSocket connection
+connectWebSocket();
 
 // Handle incoming WebSocket messages
 function handleWebSocketMessage(data) {
@@ -189,17 +220,21 @@ function animate() {
 
 // Ensure audio plays on button click to bypass autoplay restrictions
 function bypassAutoPlayRestriction() {
-    modal.style.display = 'none'; // Hide the modal
+    // Hide the modal (if applicable)
+    modal.style.display = 'none'; // Hide the modal if it's being used
     if (videoSourceUrl) {
-        video.src = videoSourceUrl;
-        video.load();
-        video.play() // Attempt to play video
+        video.src = videoSourceUrl; // Set the video source
+        video.load(); // Load the video
+
+        // Attempt to play video
+        video.play()
             .then(() => {
                 console.log("Video playback started.");
                 playAudio(); // Play the audio after the video starts
             })
             .catch(error => {
                 console.error("Error attempting to play video:", error);
+                alert("Video playback failed. Please ensure your browser supports autoplay.");
             });
     } else {
         console.error("No video source URL provided.");

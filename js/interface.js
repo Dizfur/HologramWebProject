@@ -1,22 +1,58 @@
 let selectedVideo = ''; // Variable to hold the selected video
 let selectedIcon = null; // Variable to keep track of the selected icon
+let ws; // Variable to hold the WebSocket instance
 
-// WebSocket connection
-let webSocketURL = 'wss://troubled-alkaline-carnation.glitch.me';
-const ws = new WebSocket(webSocketURL);
+// WebSocket URL
+const webSocketURL = 'wss://troubled-alkaline-carnation.glitch.me';
+let reconnectInterval = 5000; // Reconnection interval in milliseconds
+let maxRetries = 10; // Maximum reconnection attempts
+let retryCount = 0; // Current retry count
 
-ws.onopen = () => {
-	console.log(webSocketURL);
-	console.log('WebSocket connection established.');
-};
+// Initialize WebSocket connection
+function connectWebSocket() {
+    ws = new WebSocket(webSocketURL);
 
-ws.onerror = (error) => {
-	console.error('WebSocket error:', error);
-};
+    ws.onopen = () => {
+        console.log('WebSocket connection established.');
+        retryCount = 0; // Reset retry count on successful connection
+    };
 
-ws.onclose = () => {
-	console.log('WebSocket connection closed.');
-};
+    ws.onmessage = (event) => {
+        console.log('Message received:', event.data);
+    };
+
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+
+    ws.onclose = (event) => {
+        console.warn('WebSocket connection closed:', event.reason);
+        if (retryCount < maxRetries) {
+            console.log(`Reconnecting in ${reconnectInterval / 1000} seconds...`);
+            setTimeout(() => {
+                retryCount++;
+                console.log(`Reconnection attempt #${retryCount}`);
+                connectWebSocket();
+            }, reconnectInterval);
+        } else {
+            console.error('Maximum reconnection attempts reached. WebSocket not reconnected.');
+        }
+    };
+}
+
+// Send a message via WebSocket with error handling
+function sendWebSocketMessage(message) {
+    if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(message));
+        console.log('Message sent:', message);
+    } else {
+        console.error('Cannot send message. WebSocket is not open.');
+        alert('Unable to send the message. WebSocket connection is not active.');
+    }
+}
+
+// Establish WebSocket connection
+connectWebSocket();
 
 function toggleIcon(iconElement, type, video) {
 	// Check if the clicked icon is already selected
@@ -84,24 +120,55 @@ function showPreview(type, video) {
 	selectedVideo = video; // Set the selected video based on user interaction
 }
 
-function playAnimation() {
-	if (selectedVideo) {
-		// Send a message to all connected clients to play the selected video
-		const message = {
-			action: 'play',
-			video: selectedVideo // The path to the video file
-		};
-		const jsonmessage = JSON.stringify(message);
-		console.log(jsonmessage);
-		ws.send(jsonmessage);
-
-		// Update last played video info
-		const lastPlayedInfo = document.getElementById('last-played-info');
-		lastPlayedInfo.innerHTML = `${selectedVideo.split('/').pop()}`; // Extracts the video filename from the path
-	} else {
-		alert('Please select an energy type first.');
-	}
+// Function to check if the video file exists
+function videoExists(videoPath) {
+    // Create a new Promise to check video existence
+    return new Promise((resolve) => {
+        const video = document.createElement('video');
+        video.src = videoPath;
+        
+        // Event listener for when the video can play
+        video.oncanplaythrough = () => resolve(true);
+        // Event listener for errors
+        video.onerror = () => resolve(false);
+        
+        // Load the video to trigger the above events
+        video.load();
+    });
 }
+
+
+// Function to play the selected animation video
+async function playAnimation() {
+    if (selectedVideo) {
+        // Append '/videos' to the selected video path
+        const videoPath = `/videos/${selectedVideo}`;
+        
+        // Check if the video exists before sending the WebSocket message
+        const exists = await videoExists(videoPath);
+        
+        if (exists) {
+            // Send a message to all connected clients to play the selected video
+            const message = {
+                action: 'play',
+                video: selectedVideo // The path to the video file
+            };
+            sendWebSocketMessage(message);
+            // Log the video file being played
+			console.log('Playing video:', selectedVideo);
+
+            // Update last played video info
+            const lastPlayedInfo = document.getElementById('last-played-info');
+            lastPlayedInfo.innerHTML = `${selectedVideo.split('/').pop()}`; // Extracts the video filename from the path
+        } else {
+            alert('Selected video is missing or cannot be played.');
+            console.error('Video not found:', selectedVideo);
+        }
+    } else {
+        alert('Please select an energy type first.');
+    }
+}
+
 
 // Open the Quiz modal
 function openQuizModal() {
@@ -113,32 +180,38 @@ function closeQuizModal() {
 	document.getElementById('quiz-modal').style.display = 'none';
 }
 
-// Play the selected video
-function playQuizVideo(videoFile) {
-    // Log the video file being played
-    console.log('Playing video:', videoFile);
+// Function to play the quiz video
+async function playQuizVideo(videoFile) {
+    // Append '/videos' to the selected video path
+        const videoPath = `/videos/${videoFile}`;
+        
+    // Check if the video exists before sending the WebSocket message
+    const exists = await videoExists(videoPath);
+    
+    if (exists) {
+        // Send a message to all connected clients to play the selected video
+        if (ws.readyState === WebSocket.OPEN) {
+            const message = {
+                action: 'play',
+                video: videoFile // The path to the video file
+            };
+            sendWebSocketMessage(message);
+            // Log the video file being played
+   			console.log('Playing video:', videoFile);
 
-    // Send a message to all connected clients to play the selected video
-    if (ws.readyState === WebSocket.OPEN) {
-        const message = {
-            action: 'play',
-            video: videoFile // The path to the video file
-        };
-        const jsonmessage = JSON.stringify(message);
-        console.log(jsonmessage);
-        ws.send(jsonmessage);
-		
-        // Update last played video info
-        const lastPlayedInfo = document.getElementById('last-played-info');
-        lastPlayedInfo.innerHTML = `${videoFile.split('/').pop()}`; // Extracts the video filename from the path
+            // Update last played video info
+            const lastPlayedInfo = document.getElementById('last-played-info');
+            lastPlayedInfo.innerHTML = `${videoFile.split('/').pop()}`; // Extracts the video filename from the path
 
-        // Show the answer modal
-        document.getElementById('answer-modal').style.display = 'flex';
+            // Show the answer modal
+            document.getElementById('answer-modal').style.display = 'flex';
+        } else {
+            console.error('WebSocket is not open. Cannot send video data.');
+        }
     } else {
-        console.error('WebSocket is not open. Cannot send video data.');
+        alert('The quiz video is missing or cannot be played.');
+        console.error('Quiz video not found:', videoFile);
     }
-
-    //closeQuizModal(); // Close the quiz modal
 }
 
 function zoomInOut() {
@@ -165,9 +238,7 @@ function closeReportModal() {
             action: 'play',
             video: answervideoFile // The path to the video file
         };
-        const jsonmessage = JSON.stringify(message);
-        console.log(jsonmessage);
-        ws.send(jsonmessage);
+		sendWebSocketMessage(message);
 
         closeAnswerModal(); // Close the answer modal
 	} else {
