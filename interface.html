@@ -202,6 +202,29 @@
             background-color: #2563eb; /* Slightly darker on hover */
         }
 
+        #quiz-modal, #answer-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1010;
+        }
+
+        .quiz-buttons, .answer-buttons {
+            background: #1f1f1f;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         /* Mockup Modal for Report */
         #report-modal {
             display: none;
@@ -274,31 +297,41 @@
 		</div>	
     </div>
 
-<!-- Quiz Modal -->
-<div id="quiz-modal" style="display: none;">
-    <div class="quiz-container">
-        <h3>Select Energy Type for Quiz</h3>
-        <div class="quiz-grid">
-            <button class="quiz-button" onclick="playQuizVideo('solar', 'solarQuiz.mp4')">
-                <img src="images/solar.png" alt="Solar" />
-                <span>Solar Quiz</span>
-            </button>
-            <button class="quiz-button" onclick="playQuizVideo('wind', 'windQuiz.mp4')">
-                <img src="images/wind.png" alt="Wind" />
-                <span>Wind Quiz</span>
-            </button>
-            <button class="quiz-button" onclick="playQuizVideo('hydropower', 'hydropowerQuiz.mp4')">
-                <img src="images/water.png" alt="Hydropower" />
-                <span>Hydropower Quiz</span>
-            </button>
-            <button class="quiz-button" onclick="playQuizVideo('geothermal', 'geothermalQuiz.mp4')">
-                <img src="images/geothermal.jpg" alt="Geothermal" />
-                <span>Geothermal Quiz</span>
-            </button>
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" style="display: none;">
+        <div class="quiz-container">
+            <h3>Select Energy Type for Quiz</h3>
+            <div class="quiz-grid">
+                <button class="quiz-button" onclick="playQuizVideo('solarQuiz.mp4')">
+                    <img src="images/solar.png" alt="Solar" />
+                    <span>Solar Quiz</span>
+                </button>
+                <button class="quiz-button" onclick="playQuizVideo('windQuiz.mp4')">
+                    <img src="images/wind.png" alt="Wind" />
+                    <span>Wind Quiz</span>
+                </button>
+                <button class="quiz-button" onclick="playQuizVideo('hydropowerQuiz.mp4')">
+                    <img src="images/water.png" alt="Hydropower" />
+                    <span>Hydropower Quiz</span>
+                </button>
+                <button class="quiz-button" onclick="playQuizVideo('geothermalQuiz.mp4')">
+                    <img src="images/geothermal.jpg" alt="Geothermal" />
+                    <span>Geothermal Quiz</span>
+                </button>
+            </div>
+            <button class="button close-button" onclick="closeQuizModal()">Close</button>
         </div>
-        <button class="button close-button" onclick="closeQuizModal()">Close</button>
     </div>
-</div>
+
+    <!-- Answer Modal -->
+    <div id="answer-modal">
+        <div class="answer-buttons">
+            <h3>Is this statement True or False?</h3>
+            <button class="button" onclick="sendAnswer('true.mp4')">True</button>
+            <button class="button" onclick="sendAnswer('false.mp4')">False</button>
+            <button class="button" onclick="closeAnswerModal()">Close</button>
+        </div>
+    </div>
 
     <!-- Mockup Modal for Report -->
     <div id="report-modal" style="display: none;">

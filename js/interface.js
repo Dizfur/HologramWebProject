@@ -114,9 +114,7 @@ function closeQuizModal() {
 }
 
 // Play the selected video
-function playQuizVideo(energyType, videoFile) {
-    const videoType = energyType; // Energy type (e.g., solar, wind, etc.)
-
+function playQuizVideo(videoFile) {
     // Log the video file being played
     console.log('Playing video:', videoFile);
 
@@ -155,4 +153,29 @@ function generateReport() {
 function closeReportModal() {
 	// Close the report modal
 	document.getElementById('report-modal').style.display = 'none';
+}
+
+ // Send the answer to the server
+ function sendAnswer(answervideoFile) {
+	console.log('User selected answer:', answervideoFile);
+
+	// Send a message to all connected clients to play the selected video
+    if (ws.readyState === WebSocket.OPEN) {
+        const message = {
+            action: 'play',
+            video: answervideoFile // The path to the video file
+        };
+        const jsonmessage = JSON.stringify(message);
+        console.log(jsonmessage);
+        ws.send(jsonmessage);
+
+        closeAnswerModal(); // Close the answer modal
+	} else {
+        console.error('WebSocket is not open. Cannot send video data.');
+	}
+}
+
+// Close the Answer modal
+function closeAnswerModal() {
+	document.getElementById('answer-modal').style.display = 'none';
 }
