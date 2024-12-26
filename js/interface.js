@@ -103,6 +103,39 @@ function playAnimation() {
 	}
 }
 
+// Open the Quiz modal
+function openQuizModal() {
+	document.getElementById('quiz-modal').style.display = 'flex';
+}
+
+// Close the Quiz modal
+function closeQuizModal() {
+	document.getElementById('quiz-modal').style.display = 'none';
+}
+
+// Play the selected video
+function playQuizVideo(energyType, videoFile) {
+    const videoType = energyType; // Energy type (e.g., solar, wind, etc.)
+
+    // Log the video file being played
+    console.log('Playing video:', videoFile);
+
+    // Send a message to all connected clients to play the selected video
+    if (ws.readyState === WebSocket.OPEN) {
+        const message = {
+            action: 'play',
+            video: videoFile // The path to the video file
+        };
+        const jsonmessage = JSON.stringify(message);
+        console.log(jsonmessage);
+        ws.send(jsonmessage);
+    } else {
+        console.error('WebSocket is not open. Cannot send video data.');
+    }
+
+    //closeQuizModal(); // Close the quiz modal
+}
+
 function zoomInOut() {
 	alert('Zoom functionality will be implemented here.');
 }
