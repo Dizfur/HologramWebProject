@@ -110,6 +110,13 @@
             background-color: #2563eb;
         }
 
+        .button-icon {
+            width: 20px; /* Adjust the width of the icon */
+            height: 20px; /* Adjust the height of the icon */
+            margin-right: 8px; /* Space between the icon and the button text */
+            vertical-align: top; /* Align icon vertically with text */
+        }
+
         /* Modal for Quiz */
         /* Modal Container */
         #quiz-modal {
@@ -242,10 +249,22 @@
 
         <!-- Button Group -->
         <div class="button-group">
-            <button class="button" onclick="zoomInOut()">Zoom In/Out</button>		
-            <button class="button" onclick="playAnimation()">Play Animation</button>
-            <button class="button" onclick="openQuizModal()">Quiz</button> <!-- Added Quiz button -->
-            <button class="button" onclick="generateReport()">Report</button>   
+            <button class="button" onclick="zoomInOut()">
+                <img src="images/zoom-in.png" alt="Zoom Icon" class="button-icon" />
+                Zoom In/Out
+            </button>		
+            <button class="button" onclick="playAnimation()">
+                <img src="images/play.png" alt="Play Icon" class="button-icon" />
+                Play Animation
+            </button>
+            <button class="button" onclick="openQuizModal()">
+                <img src="images/quiz.png" alt="Quiz Icon" class="button-icon" />
+                Quiz
+            </button>
+            <button class="button" onclick="generateReport()">
+                <img src="images/report.png" alt="Report Icon" class="button-icon" />
+                Report
+            </button>   
         </div>
 		
 		<!-- Last Played Video Section -->
