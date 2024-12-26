@@ -2,7 +2,6 @@ let selectedVideo = ''; // Variable to hold the selected video
 let selectedIcon = null; // Variable to keep track of the selected icon
 
 // WebSocket connection
-//let webSocketURL = 'ws://192.168.0.222:3000';
 let webSocketURL = 'wss://troubled-alkaline-carnation.glitch.me';
 const ws = new WebSocket(webSocketURL);
 
