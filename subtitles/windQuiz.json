@@ -1,17 +1,27 @@
 [
   {
-    "text": "A windmill generator operates by converting",
-    "time": 0.0,
+    "text": "A windmill generator",
+    "time": 0,
     "color": "#c73333"
   },
   {
-    "text": "water energy into electricity.",
+    "text": "operates by converting",
+    "time": 1.2,
+    "color": "#c73333"
+  },
+  {
+    "text": "water energy",
     "time": 2.5,
     "color": "#c73333"
   },
   {
-    "text": "True or False?",
-    "time": 5.0,
+    "text": "into electricity.",
+    "time": 3,
     "color": "#c73333"
+  },
+  {
+    "text": "True or False?",
+    "time": 4.5,
+    "color": "#4d9da8"
   }
 ]

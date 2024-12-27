@@ -1,17 +1,27 @@
 [
   {
-    "text": "Solar energy is harnessed from the sun",
-    "time": 0.0,
+    "text": "Solar energy is harnessed",
+    "time": 0,
+    "color": "#c73333"
+  },
+  {
+    "text": " from the sun",
+    "time": 1.5,
     "color": "#c73333"
   },
   {
     "text": "and is essential",
-    "time": 2.5,
+    "time": 2,
     "color": "#c73333"
   },
   {
     "text": "for a sustainable future.",
-    "time": 4.0,
+    "time": 3,
     "color": "#c73333"
+  },
+  {
+    "text": "True or false?",
+    "time": 4.8,
+    "color": "#4d9da8"
   }
 ]

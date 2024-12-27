@@ -156,6 +156,10 @@ function playAudio() {
     }
 }
 
+function pauseAudio() {
+    if (audio) audio.pause();
+}
+
 function synchronizeAudioVideo() {
     if (audio && !audio.paused && Math.abs(audio.currentTime - video.currentTime) > 0.2) {
         console.log(`Resyncing audio: video time ${video.currentTime}, audio time ${audio.currentTime}`);
@@ -194,7 +198,9 @@ function init() {
     createHologramPlanes();
 
     window.addEventListener("resize", onWindowResize, false);
-    //video.addEventListener("timeupdate", synchronizeAudioVideo);
+    video.addEventListener("timeupdate", synchronizeAudioVideo);
+    video.addEventListener("play", playAudio);
+    video.addEventListener("pause", pauseAudio);
     bypassAutoplayRestrictionButton.addEventListener('click', bypassAutoPlayRestriction);
 
     // Play the default video
