@@ -1,0 +1,77 @@
+[
+  {
+    "text": "Hydropower",
+    "time": 0,
+    "color": "#00FFFF"
+  },
+  {
+    "text": "Hydropower or hydroelectricity refers to the conversion of energy from flowing water into electricity.",
+    "time": 2,
+    "color": "#FFFF00"
+  },
+  {
+    "text": "It is considered a renewable energy source because the water cycle is constantly renewed by the sun.",
+    "time": 5,
+    "color": "#00FF00"
+  },
+  {
+    "text": "One of the first uses of hydroenergy was for mechanical milling such as grinding grains.",
+    "time": 9,
+    "color": "#00FFFF"
+  },
+  {
+    "text": "Today, modern hydro plants produce electricity using turbines and generators.",
+    "time": 13,
+    "color": "#FFFF00"
+  },
+  {
+    "text": "The mechanical energy created by moving water spins rotors on a turbine.",
+    "time": 17,
+    "color": "#00FF00"
+  },
+  {
+    "text": "This turbine is connected to an electromagnetic generator which produces electricity when the turbine spins.",
+    "time": 22,
+    "color": "#00FFFF"
+  },
+  {
+    "text": "There are two main types of hydroelectricity production: dams and run-of-river.",
+    "time": 27,
+    "color": "#FFFF00"
+  },
+  {
+    "text": "Hydro dams utilize the potential energy from dammed water to produce electricity.",
+    "time": 31,
+    "color": "#00FF00"
+  },
+  {
+    "text": "The elevation created by the dam creates gravitational force for turning the turbine when water is released.",
+    "time": 35,
+    "color": "#FFFF00"
+  },
+  {
+    "text": "This is referred to as pumped storage hydro.",
+    "time": 40,
+    "color": "#00FFFF"
+  },
+  {
+    "text": "The second form of hydroelectricity production is run-of-river hydro.",
+    "time": 43,
+    "color": "#FFFF00"
+  },
+  {
+    "text": "Run-of-river still uses turbines and generators but relies on natural water flow rates of rivers.",
+    "time": 47,
+    "color": "#00FF00"
+  },
+  {
+    "text": "Hydropower has several benefits. It is a cost-competitive form of electricity.",
+    "time": 51,
+    "color": "#FFFF00"
+  },
+  {
+    "text": "However, there are concerns such as environmental impacts and greenhouse gas emissions during construction.",
+    "time": 55,
+    "color": "#FF0000"
+  }
+]
