@@ -22,6 +22,12 @@ let reconnectInterval = 5000; // Reconnection interval in milliseconds
 let maxRetries = 10; // Maximum reconnection attempts
 let retryCount = 0; // Current retry count
 
+// Establish WebSocket connection
+connectWebSocket();
+
+// Initialize the application
+init();
+
 // Initialize WebSocket connection
 function connectWebSocket() {
     ws = new WebSocket(webSocketURL);
@@ -66,8 +72,48 @@ function sendWebSocketMessage(message) {
     }
 }
 
-// Establish WebSocket connection
-connectWebSocket();
+// Initialize Three.js
+function init() {
+    // Create the scene
+    scene = new THREE.Scene();
+
+    // Set up camera
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+
+    // Set up renderer
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Create a video element
+    video = document.createElement('video');
+    video.crossOrigin = 'anonymous'; // Allow cross-origin video loading
+    video.muted = true; // Mute the video if autoplaying in some browsers
+    video.loop = false; // Disable loop for sequential playback
+    video.controls = false;
+    video.autoplay = true;
+
+    // Create video texture
+    videoTexture = new THREE.VideoTexture(video);
+    videoTexture.minFilter = THREE.LinearFilter;
+    videoTexture.magFilter = THREE.LinearFilter;
+
+    // Create hologram planes
+    createHologramPlanes();
+
+    window.addEventListener("resize", onWindowResize, false);
+    video.addEventListener("timeupdate", synchronizeAudioVideo);
+    video.addEventListener("play", playAudio);
+    video.addEventListener("pause", pauseAudio);
+    bypassAutoplayRestrictionButton.addEventListener('click', bypassAutoPlayRestriction);
+
+    // Play the default video
+    playIntroAssistantVideo();
+
+    // Start the render loop
+    animate();
+}
 
 // Handle incoming WebSocket messages
 function handleWebSocketMessage(data) {
@@ -167,49 +213,6 @@ function synchronizeAudioVideo() {
     }
 }
 
-// Initialize Three.js
-function init() {
-    // Create the scene
-    scene = new THREE.Scene();
-
-    // Set up camera
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 5;
-
-    // Set up renderer
-    renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    // Create a video element
-    video = document.createElement('video');
-    video.crossOrigin = 'anonymous'; // Allow cross-origin video loading
-    video.muted = true; // Mute the video if autoplaying in some browsers
-    video.loop = false; // Disable loop for sequential playback
-    video.controls = false;
-    video.autoplay = true;
-
-    // Create video texture
-    videoTexture = new THREE.VideoTexture(video);
-    videoTexture.minFilter = THREE.LinearFilter;
-    videoTexture.magFilter = THREE.LinearFilter;
-
-    // Create hologram planes
-    createHologramPlanes();
-
-    window.addEventListener("resize", onWindowResize, false);
-    video.addEventListener("timeupdate", synchronizeAudioVideo);
-    video.addEventListener("play", playAudio);
-    video.addEventListener("pause", pauseAudio);
-    bypassAutoplayRestrictionButton.addEventListener('click', bypassAutoPlayRestriction);
-
-    // Play the default video
-    playIntroAssistantVideo();
-
-    // Start the render loop
-    animate();
-}
-
 // Function to play the default video
 async function playIntroAssistantVideo() {
     video.src = videoSourceUrl; // Set the video source to the default URL
@@ -276,60 +279,60 @@ function updateSubtitles() {
     rightSubtitleElement.style.color = subtitleColor;
 }
 
-    function createHologramPlanes() {
-        const planeGeometry = new THREE.PlaneGeometry(4, 2.25);
-        const videoMaterial = new THREE.MeshBasicMaterial({ map: videoTexture, side: THREE.DoubleSide });
+function createHologramPlanes() {
+    const planeGeometry = new THREE.PlaneGeometry(4, 2.25);
+    const videoMaterial = new THREE.MeshBasicMaterial({ map: videoTexture, side: THREE.DoubleSide });
 
-        const borderMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
-        const edgesGeometry = new THREE.EdgesGeometry(planeGeometry);
+    const borderMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    const edgesGeometry = new THREE.EdgesGeometry(planeGeometry);
 
-        const createPlaneWithBorder = (position, rotation, scale) => {
-            // Create the main plane
-            const plane = new THREE.Mesh(planeGeometry, videoMaterial);
-            plane.position.set(position.x, position.y, position.z);
-            plane.rotation.set(rotation.x, rotation.y, rotation.z);
-            plane.scale.set(scale.x, scale.y, scale.z);
-            scene.add(plane);
+    const createPlaneWithBorder = (position, rotation, scale) => {
+        // Create the main plane
+        const plane = new THREE.Mesh(planeGeometry, videoMaterial);
+        plane.position.set(position.x, position.y, position.z);
+        plane.rotation.set(rotation.x, rotation.y, rotation.z);
+        plane.scale.set(scale.x, scale.y, scale.z);
+        scene.add(plane);
 
-            // Optionally add a border
-            if (showBorders) {
-                const border = new THREE.LineSegments(edgesGeometry, borderMaterial);
-                border.position.copy(plane.position);
-                border.rotation.copy(plane.rotation);
-                border.scale.copy(plane.scale);
-                scene.add(border);
-            }
-        };
+        // Optionally add a border
+        if (showBorders) {
+            const border = new THREE.LineSegments(edgesGeometry, borderMaterial);
+            border.position.copy(plane.position);
+            border.rotation.copy(plane.rotation);
+            border.scale.copy(plane.scale);
+            scene.add(border);
+        }
+    };
 
-        // Common scale value for planes
-        const planeScale = { x: 0.64, y: 0.64, z: 0.2 };
+    // Common scale value for planes
+    const planeScale = { x: 0.64, y: 0.64, z: 0.2 };
 
-        // Add planes with their positions, rotations, and scales
-        // Top plane
-        createPlaneWithBorder(
-            { x: 0, y: 2, z: 0 }, //position
-            { x: 0, y: 0, z: 0 }, //rotation
-            planeScale //scale
-        );
-        // Bottom plane
-        createPlaneWithBorder(
-            { x: 0, y: -2, z: 0 }, //position
-            { x: 0, y: 0, z: 0 }, //rotation
-            { x: -planeScale.x, y: -planeScale.y, z: planeScale.z }	//scale
-        );
-        // Left plane
-        createPlaneWithBorder(
-            { x: -1.5, y: 0, z: 0 }, //position
-            { x: 0, y: 0, z: (3 * Math.PI) / 2 }, //rotation
-            { x: -planeScale.x, y: -planeScale.y, z: planeScale.z } //scale
-        );
-        // Right plane
-        createPlaneWithBorder(
-            { x: 1.5, y: 0, z: 0 }, //position
-            { x: 0, y: 0, z: Math.PI / 2 }, //rotation
-            { x: -planeScale.x, y: -planeScale.y, z: planeScale.z } //scale
-        );
-    }
+    // Add planes with their positions, rotations, and scales
+    // Top plane
+    createPlaneWithBorder(
+        { x: 0, y: 2, z: 0 }, //position
+        { x: 0, y: 0, z: 0 }, //rotation
+        planeScale //scale
+    );
+    // Bottom plane
+    createPlaneWithBorder(
+        { x: 0, y: -2, z: 0 }, //position
+        { x: 0, y: 0, z: 0 }, //rotation
+        { x: -planeScale.x, y: -planeScale.y, z: planeScale.z }	//scale
+    );
+    // Left plane
+    createPlaneWithBorder(
+        { x: -1.5, y: 0, z: 0 }, //position
+        { x: 0, y: 0, z: (3 * Math.PI) / 2 }, //rotation
+        { x: -planeScale.x, y: -planeScale.y, z: planeScale.z } //scale
+    );
+    // Right plane
+    createPlaneWithBorder(
+        { x: 1.5, y: 0, z: 0 }, //position
+        { x: 0, y: 0, z: Math.PI / 2 }, //rotation
+        { x: -planeScale.x, y: -planeScale.y, z: planeScale.z } //scale
+    );
+}
 
 // Adjust the camera and renderer when the window is resized
 function onWindowResize() {
@@ -337,6 +340,3 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
-
-// Initialize the application
-init();
