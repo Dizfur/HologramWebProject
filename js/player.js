@@ -129,15 +129,21 @@ async function loadAudio(videoSrc) {
         const audioResponse = await fetch(audioSrc, { method: "HEAD" });
         if (!audioResponse.ok) {
             console.warn(`Audio file not found for video: ${videoBaseName}`);
-            audio = null; // No audio for this video
-        } else {
-            // Load the audio file
             if (audio) {
                 audio.pause();
+                audio = null; // Ensure the previous audio instance is cleaned up
             }
-            audio = new Audio(audioSrc);
-            audio.loop = false; // Disable looping
+            return;
         }
+
+        // Load the new audio file
+        if (audio) {
+            audio.pause(); // Stop any existing audio
+            audio = null; // Clear the old instance
+        }
+        audio = new Audio(audioSrc);
+        audio.loop = false;
+        console.log("Audio loaded:", audioSrc);
     } catch (error) {
         console.error("Error loading audio:", error);
     }
@@ -152,6 +158,7 @@ function playAudio() {
 
 function synchronizeAudioVideo() {
     if (audio && !audio.paused && Math.abs(audio.currentTime - video.currentTime) > 0.2) {
+        console.log(`Resyncing audio: video time ${video.currentTime}, audio time ${audio.currentTime}`);
         audio.currentTime = video.currentTime; // Resynchronize if desynced
     }
 }
@@ -187,7 +194,7 @@ function init() {
     createHologramPlanes();
 
     window.addEventListener("resize", onWindowResize, false);
-    video.addEventListener("timeupdate", synchronizeAudioVideo);
+    //video.addEventListener("timeupdate", synchronizeAudioVideo);
     bypassAutoplayRestrictionButton.addEventListener('click', bypassAutoPlayRestriction);
 
     // Play the default video
@@ -199,9 +206,6 @@ function init() {
 
 // Function to play the default video
 async function playIntroAssistantVideo() {
-
-    // Hide the bypass autoplay restriction button
-    //bypassAutoplayRestrictionButton.style.display = 'none'; // Hide the button
     video.src = videoSourceUrl; // Set the video source to the default URL
     video.load(); // Load the video
     loadAudio(videoSourceUrl); // Load audio for the default video
