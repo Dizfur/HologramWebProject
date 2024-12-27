@@ -140,6 +140,7 @@ function handleVideoPlay(videoFile) {
     video.load(); // Load the new video
     loadSubtitles(newVideoUrl); // Load subtitles for the new video
     loadAudio(newVideoUrl).then(() => {
+        video.muted = false;
         playAudio(); // Attempt to play audio after loading
     });
     video.play().catch(error => {
