@@ -133,6 +133,7 @@ function handleWebSocketMessage(data) {
 }
 
 // Handle video playback
+// Browser Limitation: Inactive tabs cause longer videos to pause, but shorter videos are unaffected.
 function handleVideoPlay(videoFile) {
     const newVideoUrl = 'videos/' + videoFile; // Assuming the message contains the video URL
     console.log('New video URL:', newVideoUrl); // Log the new URL
@@ -140,7 +141,6 @@ function handleVideoPlay(videoFile) {
     video.load(); // Load the new video
     loadSubtitles(newVideoUrl); // Load subtitles for the new video
     loadAudio(newVideoUrl).then(() => {
-        video.muted = false;
         playAudio(); // Attempt to play audio after loading
     });
     video.play().catch(error => {
@@ -239,7 +239,7 @@ function bypassAutoPlayRestriction() {
     if (videoSourceUrl) {
         video.src = videoSourceUrl; // Set the video source
         video.load(); // Load the video
-
+        video.muted = false;
         // Attempt to play video
         video.play()
             .then(() => {
