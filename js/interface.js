@@ -4,9 +4,11 @@ let ws; // Variable to hold the WebSocket instance
 
 // WebSocket URL
 const webSocketURL = 'wss://troubled-alkaline-carnation.glitch.me';
+const messageThrottleInterval = 1000; // Throttle interval in milliseconds (e.g., 1000ms = 1 second)
 let reconnectInterval = 5000; // Reconnection interval in milliseconds
 let maxRetries = 10; // Maximum reconnection attempts
 let retryCount = 0; // Current retry count
+let lastMessageTimestamp = 0; // Track the timestamp of the last message sent
 
 // Initialize WebSocket connection
 function connectWebSocket() {
@@ -42,9 +44,16 @@ function connectWebSocket() {
 
 // Send a message via WebSocket with error handling
 function sendWebSocketMessage(message) {
+    const currentTimestamp = Date.now();
+    if (currentTimestamp - lastMessageTimestamp < messageThrottleInterval) {
+        console.warn('Message throttled to prevent repeated sends.');
+        return; // Exit if within the throttle interval
+    }
+
     if (ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify(message));
         console.log('Message sent:', message);
+        lastMessageTimestamp = currentTimestamp; // Update the timestamp
     } else {
         console.error('Cannot send message. WebSocket is not open.');
         alert('Unable to send the message. WebSocket connection is not active.');
