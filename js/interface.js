@@ -252,6 +252,28 @@ function closeReportModal() {
 	}
 }
 
+function repeatQuestion() {
+    const lastPlayedInfo = document.getElementById('last-played-info');
+    const lastPlayedVideo = lastPlayedInfo ? lastPlayedInfo.innerHTML.trim() : '';
+
+    if (lastPlayedVideo) {
+        console.log('Repeating question video:', lastPlayedVideo);
+
+        if (ws.readyState === WebSocket.OPEN) {
+            const message = {
+                action: 'play',
+                video: `videos/${lastPlayedVideo}` // Append the path to the video file
+            };
+            sendWebSocketMessage(message);
+        } else {
+            console.error('WebSocket is not open. Cannot repeat question video.');
+        }
+    } else {
+        alert('No question video to repeat.');
+        console.error('No last played video found to replay.');
+    }
+}
+
 // Close the Answer modal
 function closeAnswerModal() {
 	document.getElementById('answer-modal').style.display = 'none';
