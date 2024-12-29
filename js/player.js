@@ -4,6 +4,7 @@ const videoSourceUrl = params.get('video') || 'videos/introAssistant.mp4'; // De
 
 // Get DOM elements
 const bypassAutoplayRestrictionButton = document.getElementById('bypass-autoplay-restriction-button');
+const centerMarker = document.getElementById('center-marker');
 const topSubtitleElement = document.getElementById("top-subtitle");
 const bottomSubtitleElement = document.getElementById("bottom-subtitle");
 const leftSubtitleElement = document.getElementById("left-subtitle");
@@ -236,6 +237,7 @@ function animate() {
 function bypassAutoPlayRestriction() {
     // Hide the modal (if applicable)
     modal.style.display = 'none'; // Hide the modal if it's being used
+    centerMarker.style.display = 'none';
     if (videoSourceUrl) {
         video.src = videoSourceUrl; // Set the video source
         video.load(); // Load the video
@@ -311,13 +313,13 @@ function createHologramPlanes() {
     // Add planes with their positions, rotations, and scales
     // Top plane
     createPlaneWithBorder(
-        { x: 0, y: 2, z: 0 }, //position
+        { x: 0, y: 2.8, z: 0 }, //position
         { x: 0, y: 0, z: 0 }, //rotation
         planeScale //scale
     );
     // Bottom plane
     createPlaneWithBorder(
-        { x: 0, y: -2, z: 0 }, //position
+        { x: 0, y: -2.8, z: 0 }, //position
         { x: 0, y: 0, z: 0 }, //rotation
         { x: -planeScale.x, y: -planeScale.y, z: planeScale.z }	//scale
     );
