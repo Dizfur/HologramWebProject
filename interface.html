@@ -240,11 +240,11 @@
         .quiz-buttons, .answer-buttons {
             background: #1f1f1f;
             color: white;
-            padding: 20px;
+            padding: 10px;
             border-radius: 10px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 20px;
         }
 
         /* Mockup Modal for Report */
@@ -259,6 +259,7 @@
             justify-content: center;
             align-items: center;
         }
+
 		.icon.selected img {
 			border-color: #ffcc00; /* Change border color to indicate selection */
 			box-shadow: 0 0 10px rgba(255, 204, 0, 0.5); /* Add a glow effect */
@@ -348,7 +349,7 @@
     <!-- Answer Modal -->
     <div id="answer-modal">
         <div class="answer-buttons">
-            <h3>Is the answer given is correct?</h3>
+            <h3>Is the answer given by audience is correct?</h3>
             <button class="button" onclick="sendAnswer('true.mp4')">Yes</button>
             <button class="button" onclick="sendAnswer('false.mp4')">No</button>
             <button class="button" onclick="repeatQuestion()">Repeat Question</button>
